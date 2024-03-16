@@ -22,6 +22,9 @@ app.use(ReqDomain);
 const Api = require('./routes/index');
 router.use('/', Api);
 
+const sign = require('./routes/auth/signUp');
+router.use('/personal/auth/register', sign);
+
 // Add redirection to naveenportfolio.site
 app.get("/", (req, res) => {
     res.redirect("https://finance.fitwin.co");
