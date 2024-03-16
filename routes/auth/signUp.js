@@ -2,19 +2,12 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("../../modlers/user");
+const User = require("../../models/user");
 
 router.post("/", async (req, res) => {
   try {
-    const {
-      first_name,
-      last_name,
-      email,
-      password,
-      mobile_number,
-      personal_account,
-      business_account,
-    } = req.body;
+    const { firstname, lastname, username, currency, email, password } =
+      req.body;
 
     // Check if the email is already taken
     const existingEmail = await User.findOne({ email });
@@ -22,53 +15,53 @@ router.post("/", async (req, res) => {
       return res.status(409).json({ error: "email already exists" });
     }
 
-    // Check if the Mobile Number is already taken
-    const existingMobileNumber = await User.findOne({ email });
-    if (existingMobileNumber) {
-      return res.status(409).json({
-        error: "Mobile number already associated with another account",
-      });
+    // Check if the username is already taken
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(409).json({ error: "Username already exists" });
     }
 
     // Generate hashed password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate a JWT token for the user
-    const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY);
-
-    // Generate a refresh token with a longer expiration time
-    const refreshToken = jwt.sign(
-      { userId: user._id },
-      process.env.SECRET_KEY,
-      { expiresIn: "15d" }
-    );
-
     // Create a new user with the encrypted password
     const newUser = new User({
-      first_name,
-      last_name,
+      firstname,
+      lastname,
       email,
+      username,
+      currency,
       password: hashedPassword,
-      mobile_number,
-      personal_account,
-      business_account,
-      access_token: token,
-      refresh_token : refreshToken,
+      is_blocked: false,
+      oldpassword: "",
+      balance: 0,
+      todayExpenses: 0,
+      yesterdayExpenses: 0,
+      thisWeekExpenses: 0,
+      lastWeekExpenses: 0,
+      thisWeekIncome: 0,
+      lastWeekIncome: 0,
+      thisMonthIncome: 0,
+      lastMonthIncome: 0,
+      annualIncome: 0,
+      lastYearIncome: 0,
     });
     await newUser.save();
 
+    // Generate a JWT token for the user
+    const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY);
+
     res.status(200).json({
+      accessToken: token,
       success: true,
       message: "Account created successfully",
       id: newUser._id,
-      first_name,
-      last_name,
+      firstname,
+      lastname,
+      username,
       email,
-      mobile_number,
-      personal_account,
-      business_account,
-      access_token: token,
-      refresh_token : refreshToken,
+      currency,
+      balance: newUser.balance,
     });
   } catch (error) {
     console.error("Error signing up:", error);

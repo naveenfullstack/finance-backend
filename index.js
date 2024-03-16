@@ -1,13 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
-require('dotenv').config();
 const app = express();
-const router = express.Router();
-
 app.use(express.json());
 app.use(cors());
-const server = http.createServer(app);
+require("dotenv").config();
+const server = http.createServer(app); // Create an HTTP server using Express app
 
 // Database
 const connectToDatabase = require("./databases/defaultDb");
@@ -15,24 +13,18 @@ connectToDatabase();
 
 // Middlewares
 
-const ReqDomain = require("./middlewares/reqDomain");
+const ReqDomain = require("./middlewares/reqdomain");
 app.use(ReqDomain);
 
 //Routes
-const Api = require('./routes/index');
-router.use('/', Api);
-
-const sign = require('./routes/auth/signUp');
-router.use('/personal/auth/register', sign);
 
 // Add redirection to naveenportfolio.site
 app.get("/", (req, res) => {
-    res.redirect("https://finance.fitwin.co");
-  });
-
-app.get("/hello", (req, res) => {
-    res.json({ message: `Hello, user` });
+  res.redirect("https://naveenportfolio.site");
 });
+
+const Api = require("./routes/index");
+app.use("/", Api);
 
 // connection
 const port = process.env.PORT || 9001;
