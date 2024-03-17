@@ -6,8 +6,15 @@ const User = require("../../models/user");
 
 router.post("/", async (req, res) => {
   try {
-    const { firstname, lastname, username, currency, email, password } =
-      req.body;
+    const {
+      first_name,
+      last_name,
+      email,
+      password,
+      mobile_number,
+      personal_account,
+      business_account,
+    } = req.body;
 
     // Check if the email is already taken
     const existingEmail = await User.findOne({ email });
@@ -15,10 +22,10 @@ router.post("/", async (req, res) => {
       return res.status(409).json({ error: "email already exists" });
     }
 
-    // Check if the username is already taken
-    const existingUsername = await User.findOne({ username });
-    if (existingUsername) {
-      return res.status(409).json({ error: "Username already exists" });
+    // Check if the mobile number is already taken
+    const existingMobileNumber = await User.findOne({ mobile_number });
+    if (existingMobileNumber) {
+      return res.status(409).json({ error: "Mobile Number already exists" });
     }
 
     // Generate hashed password
@@ -26,42 +33,41 @@ router.post("/", async (req, res) => {
 
     // Create a new user with the encrypted password
     const newUser = new User({
-      firstname,
-      lastname,
+      first_name,
+      last_name,
       email,
-      username,
-      currency,
       password: hashedPassword,
-      is_blocked: false,
-      oldpassword: "",
-      balance: 0,
-      todayExpenses: 0,
-      yesterdayExpenses: 0,
-      thisWeekExpenses: 0,
-      lastWeekExpenses: 0,
-      thisWeekIncome: 0,
-      lastWeekIncome: 0,
-      thisMonthIncome: 0,
-      lastMonthIncome: 0,
-      annualIncome: 0,
-      lastYearIncome: 0,
+      mobile_number,
+      personal_account,
+      business_account,
+      account_created : new Date(),
     });
     await newUser.save();
 
     // Generate a JWT token for the user
     const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY);
 
+    // Generate a refresh token with a longer expiration time
+    const refreshToken = jwt.sign(
+      { userId: newUser._id },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: "15d",
+      }
+    );
+
     res.status(200).json({
-      accessToken: token,
       success: true,
       message: "Account created successfully",
       id: newUser._id,
-      firstname,
-      lastname,
-      username,
+      first_name,
+      last_name,
       email,
-      currency,
-      balance: newUser.balance,
+      mobile_number,
+      personal_account,
+      business_account,
+      access_token: token,
+      refresh_token: refreshToken,
     });
   } catch (error) {
     console.error("Error signing up:", error);

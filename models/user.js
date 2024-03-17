@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   access_token: { type: String },
   refresh_token: { type: String },
   last_login: { type: Date },
-  failed_login_attempts: { type: Decimal128 },
+  failed_login_attempts: { type: Number },
   is_blocked: { type: Boolean },
   account_created : {type : String}
 });
