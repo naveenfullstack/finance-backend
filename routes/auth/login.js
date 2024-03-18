@@ -24,7 +24,7 @@ router.post("/", async (req, res, next) => {
     }
 
     // Check if old password is provided and valid
-    if (user.old_password && await bcrypt.compare(password, user.old_password)) {
+    if (user.old_password && (await bcrypt.compare(password, user.old_password))) {
       return res.status(401).json({ error: "Old password" });
     }
 
@@ -53,27 +53,40 @@ router.post("/", async (req, res, next) => {
       }
     );
 
-    // Save accesstoken and refeshtoken in db
+    // Save access token and refresh token in db
     user.failed_login_attempts = 0;
-    //user.is_blocked = true;
     user.access_token = accessToken;
     user.refresh_token = refreshToken;
     user.last_login = new Date();
     await user.save();
 
-    res.status(200).json({
-      success: "true",
-      message: "Login Success",
+    // Prepare account details object
+    let accountDetails = {
       id: user._id,
       firstname: user.first_name,
       lastname: user.last_name,
-      personal_account : user.personal_account,
-      business_account : user.business_account,
+      personal_account: user.personal_account,
+      business_account: user.business_account,
       email,
-      access_token : accessToken,
-      refresh_token: refreshToken,
-      account_created : user.account_created
-    });
+      account_created: user.account_created,
+      secondary_auth: user.secondary_auth,
+    };
+
+    // Conditionally include access_token and refresh_token based on secondary_auth
+    if (!user.secondary_auth) {
+      accountDetails.access_token = accessToken;
+      accountDetails.refresh_token = refreshToken;
+    }
+
+    // Prepare response object
+    let responseObject = {
+      success: true,
+      message: "Login Success",
+      account_details: [accountDetails],
+    };
+
+    // Send response
+    res.status(200).json(responseObject);
 
     next();
   } catch (error) {

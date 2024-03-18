@@ -18,7 +18,11 @@ const userSchema = new mongoose.Schema({
   last_login: { type: Date },
   failed_login_attempts: { type: Number },
   is_blocked: { type: Boolean },
-  account_created : {type : String}
+  account_created : {type : String},
+  secondary_auth : {type : Boolean},
+  email_auth : {type : Boolean},
+  sms_auth : {type : Boolean},
+  mobile_app_auth : {type : Boolean}
 });
 
 const User = mediaxDB.model('User', userSchema);
