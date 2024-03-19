@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const mediaxDB = require("../databases/clientDb");
-const { Decimal128 } = mongoose.Schema.Types;
+const financeDB = require("../databases/clientDb");
 
 const userSchema = new mongoose.Schema({
   first_name: { type: String },
@@ -25,6 +24,6 @@ const userSchema = new mongoose.Schema({
   mobile_app_auth : {type : Boolean}
 });
 
-const User = mediaxDB.model('User', userSchema);
+const User = financeDB.model('User', userSchema);
 
 module.exports = User;

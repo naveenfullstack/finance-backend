@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const mediaxDB = require("../databases/clientDb");
-const { Decimal128 } = mongoose.Schema.Types;
+const financeDB = require("../databases/clientDb");
 
 const currencySchema = new mongoose.Schema({
   currency_name: { type: String },
@@ -9,6 +8,6 @@ const currencySchema = new mongoose.Schema({
   flag : {type : String}
 });
 
-const Currency = mediaxDB.model('Currency', currencySchema);
+const Currency = financeDB.model('Currency', currencySchema);
 
 module.exports = Currency;

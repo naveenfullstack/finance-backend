@@ -5,5 +5,8 @@ const router = express.Router();
 const Auth = require('./auth/index');
 router.use('/auth', Auth);
 
+const Currency = require('./currency');
+router.use('/currency', Currency);
+
 
 module.exports = router;
