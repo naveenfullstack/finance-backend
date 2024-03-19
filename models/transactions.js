@@ -11,7 +11,9 @@ const transactionSchema = new mongoose.Schema({
   amount : {type : Decimal128},
   invoice : {type : String},
   currency_id : {type : String},
-  user_id : {type : String}
+  user_id : {type : String},
+  budget_id : {type : String},
+  date : {type : Date}
 });
 
 const Transactions = financeDB.model('Transactions', transactionSchema);
